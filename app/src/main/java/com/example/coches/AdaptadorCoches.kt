@@ -35,14 +35,16 @@ class AdaptadorCoches (var list: ArrayList<Coche>): RecyclerView.Adapter<Adaptad
             val modelo:TextView=itemView.findViewById(R.id.modelo)
             val combustible:TextView=itemView.findViewById(R.id.combustible)
             val precio:TextView=itemView.findViewById(R.id.precio)
-            val imgCoche:ImageView=itemView.findViewById(R.id.imgCoche)
+            val imgcoche:ImageView=itemView.findViewById(R.id.imgCoche)
 
             matricula.text=data.matricula
             marca.text=data.marca
             modelo.text=data.modelo
             combustible.text=data.combustible
             precio.text=data.precio.toString()
-            Glide.with(itemView.context).load(data.imgCoche).into(imgCoche)
+            Glide.with(itemView.context).load(data.imgcoche).into(imgcoche)
+
+
 
             itemView.setOnClickListener{
                 Toast.makeText( itemView.context,"${data.matricula}", Toast.LENGTH_LONG).show()

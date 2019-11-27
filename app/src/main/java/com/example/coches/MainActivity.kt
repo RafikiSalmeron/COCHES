@@ -1,5 +1,7 @@
 package com.example.coches
 
+import android.content.Intent
+import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +15,14 @@ import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
+    companion object{
+        var respuesta =" ERROR "
+    }
+
+    override fun onResume() {
+        super.onResume()
+        recargar()
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,15 +30,25 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
+       recargar()
+    }
+
+    fun recargar(){
         val recyclerView:RecyclerView=findViewById(R.id.recycler)
         recyclerView.layoutManager=LinearLayoutManager(this,RecyclerView.VERTICAL, false)
-        //val coches = ArrayList<Coche>()
+
         var concesionario = ArrayList<Coche>()
+        concesionario.clear()
+        cargarCoches()
 
         var coches = URLJsonObjeto()
         if (coches != null) {
             concesionario = coches.get()!!
+            println(concesionario.get(0).imgcoche + " IMAGEN " + concesionario.get(0).marca)
+        }else{
+            println("Hola")
         }
+
 
         //coches.add(Coche("0000ABC", "Nissan", "Micra", "Diesel", 8000.00, R.drawable.error))
         //coches.add(Coche("0000BBB", "Opel", "CORSA", "Gasolina", 7000.00, R.drawable.error))
@@ -37,7 +57,9 @@ class MainActivity : AppCompatActivity() {
 
         val adapter=AdaptadorCoches(concesionario)
         recyclerView.adapter=adapter
+
     }
+
 
     fun URLJsonObjeto(): CocheArray? {
 
@@ -45,49 +67,32 @@ class MainActivity : AppCompatActivity() {
         try {
 
 
-            val json = leerUrl("http://iesayala.ddns.net/Rafiki/json01.php")
+            val json = respuesta
 
+            println(json + " RESPUESTA")
             val coche = gson.fromJson(json, CocheArray::class.java)
             return coche
-
-
             }
         catch (e: Exception){
             Log.d("RESULTADO", "error")
             return null
         }
-
-    }
-    private fun leerUrl(urlString:String): String{
-
-        val response = try {
-            URL(urlString)
-                .openStream()
-                .bufferedReader()
-                .use { it.readText() }
-        } catch (e: IOException) {
-            "Error with ${e.message}."
-        }
-        Log.d("error", response)
-        return response
     }
 
+    fun cargarCoches(){
+        MyAsinc().execute()
+        Thread.sleep(1000)
+    }
+    fun newActividad(view : View){
+        val intento = Intent(this,insertar::class.java)
+        startActivity(intento)
+    }
+}
+class MyAsinc : AsyncTask<String, String, String>(){
+    override fun doInBackground(vararg p0: String?): String {
 
-    fun leerFichero(fichero: String): String {
-        var stringFichero=""
-        try {
-            val stream = assets.open(fichero)
-            val tamano = stream.available()
-            val buffer = ByteArray(tamano)
-            stream.read(buffer)
-            stream.close()
-            stringFichero= String(buffer)
-
-        }
-        catch (e: IOException){
-
-        }
-        return stringFichero
-
+        MainActivity.respuesta = URL("http://iesayala.ddns.net/Rafiki/json01.php").readText()
+        println(MainActivity.respuesta)
+        return "OK"
     }
 }
